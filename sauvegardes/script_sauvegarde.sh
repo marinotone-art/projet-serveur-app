@@ -2,12 +2,16 @@
 
 # Configuration
 SOURCE="index.html"
-DESTINATION="sauvegardes/backup_$(date +%Y-%m-%d_%H-%M-%S).tar.gz"
+DESTINATION="sauvegardes"
+DATE=$(date +%Y-%m-%d)
 
-# Création de la sauvegarde
-tar -czvf $DESTINATION $SOURCE
+# 1. SAUVEGARDE COMPLÈTE (Tous les dimanches)
+if [ "$(date +%u)" -eq 7 ]; then
+    tar -czvf $DESTINATION/full_$DATE.tar.gz $SOURCE
+    echo "Sauvegarde COMPLÈTE effectuée."
 
-echo "------------------------------------------------"
-echo "Sauvegarde effectuee avec succes vers le NAS : $DESTINATION"
-echo "Strategie : Application de la regle 3-2-1-1-0"
-echo "------------------------------------------------"
+# 2. SAUVEGARDE DIFFÉRENTIELLE (Du lundi au samedi, basée sur la complète)
+elif [ "$(date +%u)" -lt 7 ]; then
+    tar -czvf $DESTINATION/diff_$DATE.tar.gz $SOURCE
+    echo "Sauvegarde DIFFÉRENTIELLE effectuée."
+fi
